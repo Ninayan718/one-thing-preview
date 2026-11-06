@@ -91,6 +91,16 @@ body{margin:0;background:#EDEBE6;color:#2C2C2A;font-family:-apple-system,BlinkMa
   .note{display:none}
   .phone{width:100%;height:100dvh;max-height:none;border:none;border-radius:0;box-shadow:none}
 }
+.memorial{position:absolute;inset:0;background:rgba(28,28,26,.55);display:none;flex-direction:column;z-index:18;overflow-y:auto}
+.memorial.on{display:flex}
+.mIn{background:#F7F5F1;border-radius:16px;margin:22px 14px;padding:16px}
+.mTop{display:flex;justify-content:space-between;align-items:center;font-size:14px;font-weight:500;margin-bottom:12px}
+.mClose{font-size:13px;color:#8A8880;cursor:pointer;font-weight:400;padding:4px 0 4px 12px}
+.mImg img{width:100%;display:block;border-radius:10px;border:.5px solid rgba(0,0,0,.1)}
+.mBtns{display:flex;gap:10px;margin-top:14px}
+.mBtns .btn-ghost{flex:1}
+.mNote{font-size:11px;color:#8A8880;line-height:1.6;margin-top:10px;text-align:center}
+.btn-main.sm{font-size:14px;padding:11px 0;margin-top:14px}
 </style>
 </head>
 <body>
@@ -117,6 +127,17 @@ body{margin:0;background:#EDEBE6;color:#2C2C2A;font-family:-apple-system,BlinkMa
         <button class="btn-ghost shClose" id="shClose">知道了</button>
       </div>
     </div>
+    <div class="memorial" id="memorial">
+      <div class="mIn">
+        <div class="mTop"><span>今年的纪念卡</span><span class="mClose" id="mClose">关闭</span></div>
+        <div class="mImg"><img id="mCard" alt="年度纪念卡预览"></div>
+        <div class="mBtns">
+          <button class="btn-ghost" id="mSave">保存图片</button>
+          <button class="btn-ghost" id="mCopy">复制文字版</button>
+        </div>
+        <div class="mNote">不用写日记、不用传图，全部从做过的记录自动拼出来</div>
+      </div>
+    </div>
   </div>
 </div>
 <script>
@@ -127,16 +148,37 @@ function pad(n){return n<10?'0'+n:''+n}
 function keyOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
 function today(){return keyOf(new Date())}
 function shiftKey(k,delta){var p=k.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+delta);return keyOf(d)}
+var DEMO=location.hash.indexOf('demo')>-1, _demoState=null;
+function seed(){
+  var s=defaults();
+  var picks=CARDS.filter(function(c){return c.r==='hidden'}).slice(0,2)
+    .concat(CARDS.filter(function(c){return c.r==='rare'}).slice(0,3))
+    .concat(CARDS.filter(function(c){return c.r==='common'}).slice(0,7));
+  picks.forEach(function(c,i){
+    var d=new Date();d.setDate(d.getDate()-Math.floor(i/2)-1);
+    var k=keyOf(d);
+    s.found[c.t]={date:k,r:c.r||'common',mode:(i%3===0?'together':'alone')};
+    if(!s.done[k])s.done[k]=[];
+    s.done[k].push(c.t);
+  });
+  return s;
+}
 function defaults(){return {mode:'alone',done:{},found:{},draws:{},custom:[],createdAt:today()}}
-function load(){var raw=null;try{raw=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!raw||typeof raw!=='object')raw=defaults();var d=defaults();for(var k in d){if(!(k in raw))raw[k]=d[k]}if(raw.mode!=='alone'&&raw.mode!=='together')raw.mode='alone';if(!Array.isArray(raw.custom))raw.custom=[];return raw}
-function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}return s}
+function load(){
+  if(DEMO)return _demoState||(_demoState=seed());
+  var raw=null;try{raw=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!raw||typeof raw!=='object')raw=defaults();var d=defaults();for(var k in d){if(!(k in raw))raw[k]=d[k]}if(raw.mode!=='alone'&&raw.mode!=='together')raw.mode='alone';if(!Array.isArray(raw.custom))raw.custom=[];return raw
+}
+function save(s){
+  if(DEMO){_demoState=s;return s}
+  try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}return s
+}
 function allCards(s){return CARDS.concat(s.custom||[])}
 function inMode(c,mode){if(!c.who||!c.who.length)return true;if(mode==='alone')return c.who.indexOf('solo')>-1;for(var i=0;i<c.who.length;i++){if(c.who[i]!=='solo')return true}return false}
 function pool(s,mode,exclude){var all=allCards(s),dt=s.done[today()]||[];var usable=all.filter(function(c){return inMode(c,mode)&&c.t!==exclude});var fresh=usable.filter(function(c){return dt.indexOf(c.t)<0});return fresh.length?fresh:usable}
 function pick(s,mode,exclude){var p=pool(s,mode,exclude);return p.length?p[Math.floor(Math.random()*p.length)]:null}
 function drawsLeft(s){return Math.max(0,DAILY-(s.draws[today()]||0))}
 function consume(s){var t=today();s.draws[t]=(s.draws[t]||0)+1;return save(s)}
-function markDone(s,c){var t=today();if(!s.done[t])s.done[t]=[];if(s.done[t].indexOf(c.t)<0)s.done[t].push(c.t);if(!s.found[c.t])s.found[c.t]={date:t,r:c.r||'common'};return save(s)}
+function markDone(s,c,mode){var t=today();if(!s.done[t])s.done[t]=[];if(s.done[t].indexOf(c.t)<0)s.done[t].push(c.t);if(!s.found[c.t])s.found[c.t]={date:t,r:c.r||'common',mode:mode||'alone'};return save(s)}
 function totalDone(s){var n=0;for(var k in s.done){if(s.done.hasOwnProperty(k))n+=s.done[k].length}return n}
 function foundCount(s){return Object.keys(s.found).length}
 function streak(s){var k=today();if(!(s.done[k]&&s.done[k].length))k=shiftKey(k,-1);var n=0;for(var i=0;i<400;i++){if(s.done[k]&&s.done[k].length){n++;k=shiftKey(k,-1)}else break}return n}
@@ -178,7 +220,8 @@ function renderCollection(){
   var s=load(), all=allCards(s), f=foundCount(s), pct=all.length?Math.round(f/all.length*100):0;
   var groups=[{key:'hidden',name:'隐藏款'},{key:'rare',name:'少见'},{key:'common',name:'日常'}];
   var h='<div class="h1">做过的小事</div><div class="sub">抽到不算，做完了才收进图鉴</div>'
-   +'<div class="card" style="margin-top:18px"><div class="rv">'+esc(yearText(s))+'</div><div class="btns">'
+   +'<div class="card" style="margin-top:18px"><div class="rv">'+esc(yearText(s))+'</div>'
+   +'<button class="btn-main sm" id="btnMemorial">生成今年的纪念卡</button><div class="btns">'
    +'<button class="btn-ghost" id="btnCopy">复制这段回顾</button><button class="btn-ghost" id="btnShareRv">分享给 TA</button></div></div>'
    +'<div class="card"><div class="prow"><span>收集进度</span><span>'+f+' / '+all.length+'</span></div><div class="bar"><div class="fill" style="width:'+pct+'%"></div></div></div>';
   groups.forEach(function(g){
@@ -188,8 +231,9 @@ function renderCollection(){
     list.forEach(function(c){var ok=!!s.found[c.t];h+='<div class="cell '+(ok?'got':'')+'">'+(ok?esc(c.t):'还没抽到')+'</div>'});
     h+='</div>';
   });
-  h+='<div class="foot">断一天不清零，收集过的都在</div>';
+  h+='<div class="foot">'+(DEMO?'当前是演示数据 · 去掉链接里的 #demo 就是你自己的记录':'断一天不清零，收集过的都在')+'</div>';
   $('#page-collection').innerHTML=h;
+  $('#btnMemorial').onclick=openMemorial;
   $('#btnCopy').onclick=function(){copy(yearText(load()),'已复制')};
   $('#btnShareRv').onclick=function(){showSheet('今年我做了 '+Object.keys(load().found).length+' 件小事','年度回顾卡片')};
 }
@@ -219,12 +263,71 @@ function renderAll(){S=load();renderIndex();renderCollection();renderSettings()}
 function showCard(c){if(!c){toast('今天这个条件下都做过了');return}cur=c;renderIndex()}
 function onDraw(){var s=load();if(drawsLeft(s)<=0){goTab('collection');return}s=consume(s);showCard(pick(s,S.mode,cur?cur.t:''))}
 function onMode(m){if(m===S.mode)return;var s=load();s.mode=m;S=save(s);showCard(pick(S,m,cur?cur.t:''))}
-function onDone(){if(!cur)return;var s=load(),wasNew=!s.found[cur.t],finished=cur.t;s=markDone(s,cur);S=s;S=save(S);toast(wasNew?'收进图鉴了':'记下了');setTimeout(function(){var s2=load();if((s2.done[today()]||[]).length>=DAILY){cur=null}else{cur=pick(s2,S.mode,finished)}renderAll()},700)}
+function onDone(){if(!cur)return;var s=load(),wasNew=!s.found[cur.t],finished=cur.t;s=markDone(s,cur,S.mode);S=s;S=save(S);toast(wasNew?'收进图鉴了':'记下了');setTimeout(function(){var s2=load();if((s2.done[today()]||[]).length>=DAILY){cur=null}else{cur=pick(s2,S.mode,finished)}renderAll()},700)}
 function onShare(){showSheet('抽到一件小事：'+cur.t,'对方打开直接看到这张卡 · 不消耗次数')}
 function showSheet(t,d){$('#shT').textContent=t;$('#shD').textContent=d;$('#sheet').className='sheet on'}
 function copy(text,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast(msg)},function(){toast(msg)})}else{toast(msg)}}
 function goTab(name){tab=name;Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(el){el.className='tab'+(el.getAttribute('data-tab')===name?' on':'')});Array.prototype.forEach.call(document.querySelectorAll('.page'),function(el){el.className='page'});$('#page-'+name).className='page on';$('#navTitle').textContent=name==='index'?'今天做一件小事':(name==='collection'?'图鉴':'设置');$('#screen').scrollTop=0;if(name==='index')renderIndex();if(name==='collection')renderCollection();if(name==='settings')renderSettings()}
 Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(el){el.onclick=function(){goTab(el.getAttribute('data-tab'))}});
+function cardData(s){
+  var y=String(new Date().getFullYear());
+  var items=Object.keys(s.found).map(function(t){
+    return {t:t,date:s.found[t].date||'',r:s.found[t].r||'common',mode:s.found[t].mode||''};
+  }).filter(function(it){return it.date.indexOf(y)===0})
+    .sort(function(a,b){return a.date<b.date?1:(a.date>b.date?-1:0)});
+  var alone=0,together=0;
+  items.forEach(function(it){if(it.mode==='together')together++;else if(it.mode==='alone')alone++});
+  return {year:y,count:items.length,alone:alone,together:together,streak:streak(s),items:items};
+}
+function fmtDate(s){var p=(s||'').split('-');return p.length===3?(+p[1])+'/'+(+p[2]):(s||'')}
+function memText(d){
+  var L=[d.year+' 年，做过的 '+d.count+' 件小事','一个人 '+d.alone+' 件 · 有人陪 '+d.together+' 件 · 连续 '+d.streak+' 天',''];
+  d.items.slice(0,6).forEach(function(it){
+    L.push(fmtDate(it.date)+'  '+it.t+(it.mode==='together'?'（有人陪）':(it.mode==='alone'?'（一个人）':'')));
+  });
+  if(d.items.length>6)L.push('……还有 '+(d.items.length-6)+' 件');
+  L.push('',d.count?'都是些小事，但都做过了。':'先从第一件开始。');
+  return L.join('\n');
+}
+function rr(x,a,b,w,h,r){x.beginPath();x.moveTo(a+r,b);x.arcTo(a+w,b,a+w,b+h,r);x.arcTo(a+w,b+h,a,b+h,r);x.arcTo(a,b+h,a,b,r);x.arcTo(a,b,a+w,b,r);x.closePath()}
+function clipText(x,t,max){var s=t;while(x.measureText(s).width>max&&s.length>1)s=s.slice(0,-1);return s!==t?s+'…':s}
+function drawMemorial(d){
+  var W=640,H=960,c=document.createElement('canvas');c.width=W;c.height=H;
+  var x=c.getContext('2d'),L=62,R=W-62,FM='-apple-system,"PingFang SC","Microsoft YaHei",sans-serif';
+  x.fillStyle='#F7F5F1';x.fillRect(0,0,W,H);
+  x.fillStyle='#FFFFFF';rr(x,26,26,W-52,H-52,22);x.fill();
+  x.textBaseline='alphabetic';
+  x.fillStyle='#1D9E75';x.font='500 62px '+FM;x.fillText(d.year,L,132);
+  x.fillStyle='#2C2C2A';x.font='500 25px '+FM;x.fillText(d.count?'今年做过的 '+d.count+' 件小事':'今年还没有做过的小事',L,180);
+  x.strokeStyle='#E5E2DB';x.lineWidth=1;x.beginPath();x.moveTo(L,210);x.lineTo(R,210);x.stroke();
+  var st=[['一个人',d.alone],['有人陪',d.together],['连续天数',d.streak]];
+  st.forEach(function(v,i){var cx=L+i*180;x.fillStyle='#8A8880';x.font='400 15px '+FM;x.fillText(v[0],cx,252);x.fillStyle='#2C2C2A';x.font='500 38px '+FM;x.fillText(String(v[1]),cx,296)});
+  x.strokeStyle='#E5E2DB';x.beginPath();x.moveTo(L,326);x.lineTo(R,326);x.stroke();
+  x.fillStyle='#8A8880';x.font='400 16px '+FM;x.fillText(d.count?'最近记下的几件':'抽一件，做完就会记在这里',L,368);
+  var dots={hidden:'#7F77DD',rare:'#BA7517',common:'#1D9E75'};
+  d.items.slice(0,6).forEach(function(it,i){
+    var yy=412+i*66;
+    x.fillStyle=dots[it.r]||dots.common;x.beginPath();x.arc(L+6,yy-6,5,0,Math.PI*2);x.fill();
+    x.fillStyle='#2C2C2A';x.font='400 20px '+FM;x.fillText(clipText(x,it.t,R-L-34),L+24,yy);
+    x.fillStyle='#A8A6A0';x.font='400 14px '+FM;
+    var m=it.mode==='together'?'有人陪':(it.mode==='alone'?'一个人':'');
+    x.fillText(fmtDate(it.date)+(m?' · '+m:''),L+24,yy+22);
+  });
+  x.strokeStyle='#E5E2DB';x.beginPath();x.moveTo(L,846);x.lineTo(R,846);x.stroke();
+  x.fillStyle='#8A8880';x.font='400 17px '+FM;x.fillText(d.count?'都是些小事，但都做过了。':'先从第一件开始。',L,886);
+  x.fillStyle='#B4B2A9';x.font='400 13px '+FM;x.fillText('今天做一件小事',L,916);
+  return c.toDataURL('image/png');
+}
+var memCache=null;
+function openMemorial(){
+  memCache=cardData(load());
+  $('#mCard').src=drawMemorial(memCache);
+  $('#memorial').className='memorial on';
+}
+$('#mClose').onclick=function(){$('#memorial').className='memorial'};
+$('#memorial').onclick=function(e){if(e.target===this)this.className='memorial'};
+$('#mSave').onclick=function(){var a=document.createElement('a');a.href=$('#mCard').src;a.download=memCache.year+'-小事纪念卡.png';document.body.appendChild(a);a.click();document.body.removeChild(a);toast('图片已保存')};
+$('#mCopy').onclick=function(){copy(memText(memCache),'文字版已复制')};
 $('#shClose').onclick=function(){$('#sheet').className='sheet'};
 $('#sheet').onclick=function(e){if(e.target===this)this.className='sheet'};
 renderAll();
