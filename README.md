@@ -4,6 +4,8 @@
 
 - 数据只存浏览器 localStorage，不上传、无账号、无后端。
 - 内容池 160 条，与 `one-thing-miniapp/data/cards.js` 同源生成。
+- 图鉴页可「生成今年的纪念卡」：自动把做过的小事、日期、当时是一个人还是有人陪拼成竖版 PNG，可保存图片或复制文字版，零新增输入。
+- 想直接看成品态，在网址后加 `#demo`（载入 12 条演示记录，不写入真实数据）。
 - 这是预览页，不是真小程序；真机效果需在微信开发者工具中编译 `one-thing-miniapp/`。
 
 线上地址：https://ninayan718.github.io/one-thing-preview/
