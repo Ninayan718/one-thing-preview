@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7F5F1">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="今天做一件小事">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="data:,">
+<title>今天做一件小事 · 小程序预览</title>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:#EDEBE6;color:#2C2C2A;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC","Helvetica Neue",sans-serif;font-size:15px;line-height:1.6}
+.stage{min-height:100dvh;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;padding:24px 14px}
+.note{font-size:12px;color:#8A8880;text-align:center;line-height:1.7;max-width:420px}
+.note b{font-weight:500;color:#5F5E5A}
+.phone{width:390px;height:844px;max-height:calc(100dvh - 100px);background:#F7F5F1;border:1px solid rgba(0,0,0,.14);border-radius:36px;box-shadow:0 8px 40px rgba(0,0,0,.10);overflow:hidden;display:flex;flex-direction:column;position:relative}
+.statusbar{height:38px;flex:0 0 38px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font-size:12px;color:#2C2C2A;font-weight:500}
+.bat{width:22px;height:11px;border:1px solid #2C2C2A;border-radius:3px;position:relative;display:inline-block;vertical-align:middle;margin-left:5px}
+.bat::before{content:"";position:absolute;left:1px;top:1px;bottom:1px;width:14px;background:#2C2C2A;border-radius:1px}
+.bat::after{content:"";position:absolute;right:-3px;top:3px;height:5px;width:2px;background:#2C2C2A;border-radius:0 1px 1px 0}
+.navbar{height:44px;flex:0 0 44px;display:flex;align-items:center;justify-content:center;border-bottom:.5px solid rgba(0,0,0,.08);font-size:15px;font-weight:500}
+.screen{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch}
+.page{display:none;padding:20px 18px 32px}
+.page.on{display:block}
+.tabbar{flex:0 0 58px;display:flex;border-top:.5px solid rgba(0,0,0,.10);background:#fff;padding-bottom:6px}
+.tab{flex:1;text-align:center;font-size:11px;color:#8A8880;padding-top:8px;cursor:pointer}
+.tab .dot{display:block;width:20px;height:20px;margin:0 auto 3px;border-radius:6px;border:1.5px solid #C9C7C0}
+.tab.on{color:#1D9E75}
+.tab.on .dot{border-color:#1D9E75;background:#E1F5EE}
+.h1{font-size:22px;font-weight:500;line-height:1.35}
+.sub{color:#8A8880;font-size:13px;margin-top:4px}
+.card{background:#fff;border:.5px solid rgba(0,0,0,.12);border-radius:12px;padding:18px;margin-bottom:14px}
+.stat{display:flex;padding:14px 8px;margin-top:18px;margin-bottom:16px}
+.si{flex:1;text-align:center}
+.si .k{color:#8A8880;font-size:11px}
+.si .v{font-size:22px;font-weight:500;margin-top:2px}
+.btn-main{width:100%;background:#1D9E75;color:#fff;border:none;border-radius:12px;font-size:17px;font-weight:500;padding:15px 0;cursor:pointer;font-family:inherit}
+.btn-main:active{opacity:.85}
+.tip{text-align:center;color:#A8A6A0;font-size:12px;margin:10px 0 20px}
+.result{margin-top:6px}
+.tags{margin-bottom:10px}
+.tag{display:inline-block;padding:3px 9px;margin:0 6px 6px 0;background:#F1EFE8;border-radius:999px;font-size:11px;color:#5F5E5A}
+.tag.rare{background:#FAEEDA;color:#854F0B}
+.tag.hidden{background:#EEEDFE;color:#3C3489}
+.tt{font-size:21px;font-weight:500;line-height:1.4}
+.dd{font-size:14px;color:#5F5E5A;margin-top:10px}
+.need{margin-top:14px;padding:10px 12px;background:#F1EFE8;border-radius:8px;font-size:13px}
+.need .k{display:block;color:#8A8880;font-size:11px}
+.need .v{display:block;margin-top:2px}
+.lab{color:#8A8880;font-size:12px;margin:18px 0 8px}
+.chips{display:flex;flex-wrap:wrap}
+.chip{padding:7px 14px;margin:0 8px 8px 0;background:#fff;border:.5px solid rgba(0,0,0,.12);border-radius:999px;font-size:13px;color:#5F5E5A;cursor:pointer}
+.chip.on{background:#E1F5EE;border-color:#1D9E75;color:#0F6E56}
+.acts{display:flex;gap:8px;margin-top:18px}
+.act{flex:1;text-align:center;padding:10px 0;border-radius:10px;border:.5px solid rgba(0,0,0,.15);background:#fff;font-size:13px;cursor:pointer;font-family:inherit;color:#2C2C2A}
+.act:active{opacity:.7}
+.act.primary{background:#1D9E75;color:#fff;border-color:#1D9E75}
+.foot{color:#A8A6A0;font-size:11px;text-align:center;margin-top:28px}
+.rv{font-size:14px;line-height:1.8;color:#444441}
+.btn-ghost{background:#fff;color:#2C2C2A;border:.5px solid rgba(0,0,0,.15);border-radius:10px;font-size:13px;padding:10px 0;cursor:pointer;font-family:inherit}
+.btn-ghost:active{opacity:.7}
+.btns{display:flex;gap:10px;margin-top:14px}
+.btns .btn-ghost{flex:1}
+.prow{display:flex;justify-content:space-between;font-size:13px;color:#5F5E5A}
+.bar{height:8px;background:#F1EFE8;border-radius:999px;margin-top:12px;overflow:hidden}
+.fill{height:8px;background:#1D9E75;border-radius:999px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.cell{min-height:44px;padding:10px;border:.5px solid rgba(0,0,0,.10);border-radius:8px;background:#fff;color:#B4B2A9;font-size:12px;line-height:1.5}
+.cell.got{background:#E1F5EE;border-color:#9FE1CB;color:#0F6E56}
+.ct{font-size:15px;font-weight:500}
+.hint{color:#8A8880;font-size:12px;line-height:1.7;margin-top:6px}
+.inp{width:100%;margin-top:14px;padding:10px 12px;background:#F7F5F1;border:.5px solid rgba(0,0,0,.10);border-radius:8px;font-size:14px;font-family:inherit}
+.crow{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:.5px solid rgba(0,0,0,.08);font-size:13px}
+.cdel{color:#A32D2D;font-size:12px;cursor:pointer;padding-left:14px}
+.danger{color:#A32D2D;width:100%;margin-top:14px}
+.toast{position:absolute;left:50%;bottom:96px;transform:translateX(-50%);background:rgba(44,44,42,.92);color:#fff;font-size:13px;padding:9px 16px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20;white-space:nowrap}
+.toast.on{opacity:1}
+.sheet{position:absolute;inset:0;background:rgba(0,0,0,.35);display:none;align-items:flex-end;z-index:15}
+.sheet.on{display:flex}
+.sheetIn{width:100%;background:#fff;border-radius:16px 16px 0 0;padding:20px 18px 28px}
+.shTitle{font-size:13px;color:#8A8880;margin-bottom:14px}
+.shCard{background:#F7F5F1;border:.5px solid rgba(0,0,0,.1);border-radius:10px;padding:14px}
+.shCard .t{font-size:15px;font-weight:500}
+.shCard .d{font-size:12px;color:#8A8880;margin-top:6px}
+.shClose{width:100%;margin-top:16px}
+@media (max-width:500px){
+  body{background:#F7F5F1}
+  .stage{padding:0;display:block;min-height:100dvh}
+  .note{display:none}
+  .phone{width:100%;height:100dvh;max-height:none;border:none;border-radius:0;box-shadow:none}
+}
+</style>
+</head>
+<body>
+<div class="stage">
+  <div class="note"><b>小程序预览 Demo</b>　真机里这是三个 tab 页，这里用手机尺寸还原了界面与交互。<br>数据只存在当前浏览器，刷新不会丢；点下面的按钮真的能抽、能打卡、能收集。</div>
+  <div class="phone">
+    <div class="statusbar"><span>9:41</span><span>●●●　<span class="bat"></span></span></div>
+    <div class="navbar" id="navTitle">今天做一件小事</div>
+    <div class="screen" id="screen">
+      <div class="page on" id="page-index"></div>
+      <div class="page" id="page-collection"></div>
+      <div class="page" id="page-settings"></div>
+    </div>
+    <div class="tabbar">
+      <div class="tab on" data-tab="index"><span class="dot"></span>抽一件</div>
+      <div class="tab" data-tab="collection"><span class="dot"></span>图鉴</div>
+      <div class="tab" data-tab="settings"><span class="dot"></span>设置</div>
+    </div>
+    <div class="toast" id="toast"></div>
+    <div class="sheet" id="sheet">
+      <div class="sheetIn">
+        <div class="shTitle">在真小程序里，这里会调起微信分享</div>
+        <div class="shCard"><div class="t" id="shT"></div><div class="d" id="shD"></div></div>
+        <button class="btn-ghost shClose" id="shClose">知道了</button>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+var CARDS = [{"t":"清空一个抽屉","d":"挑家里最小的一个抽屉，全部拿出来，只放回一半。","n":"一个抽屉、一个垃圾袋","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"拍一张今天的光","d":"找窗外或桌上一处光影，调成黑白，设为手机壁纸。","n":"手机","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"给杯子去茶垢","d":"用牙膏擦一遍杯底和杯壁，冲干净看差别。","n":"牙膏、旧牙刷","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"翻出高中同学录","d":"随便翻两页，给其中一个名字发条消息。","n":"同学录、手机","p":"home","m":10,"c":"0 元","who":["solo","parent"],"r":"rare"},{"t":"把阳台的椅子擦一遍","d":"连椅腿和靠背缝一起擦，然后坐五分钟。","n":"抹布","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"给一盆植物换个位置","d":"挪到另一扇窗边，拍张照记下今天。","n":"一盆植物","p":"home","m":5,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"整理相册里最乱的一个月","d":"只删重复和拍糊的，不整理别的。","n":"手机","p":"home","m":20,"c":"0 元","who":["solo"],"r":"common"},{"t":"写一句今天闻到的事","d":"不写感受，只写气味和在哪闻到的。","n":"纸笔","p":"home","m":5,"c":"0 元","who":["solo"],"r":"rare"},{"t":"吃掉冰箱里最快过期的那样","d":"先看一眼日期，挑最靠前的那一个。","n":"冰箱","p":"home","m":5,"c":"0 元","who":["solo","couple"],"r":"common"},{"t":"给明天的自己留个便签","d":"写一句具体的、不带鼓励的话，贴在镜子上。","n":"便签","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"数一数家里有多少支笔","d":"全找出来试一遍，扔掉写不出的。","n":"一把笔","p":"home","m":15,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"换一次床单的方向","d":"把床头床尾对调铺上，今晚试试感觉。","n":"床单","p":"home","m":10,"c":"0 元","who":["solo"],"r":"rare"},{"t":"听一张专辑从头到尾","d":"不切歌、不刷手机，只听完。","n":"耳机","p":"home","m":30,"c":"0 元","who":["solo","couple"],"r":"common"},{"t":"把手机壳拆下来洗一遍","d":"温水加一点洗洁精，晾干再装回去。","n":"手机壳","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"找出一张三年前的照片","d":"看看背景里有什么东西现在已经不在了。","n":"手机","p":"home","m":5,"c":"0 元","who":["solo","parent"],"r":"rare"},{"t":"把常用 App 挪一页","d":"只留四个在第一屏，其余全塞进文件夹。","n":"手机","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"用左手做一件日常事","d":"刷牙或开门，慢慢做完。","n":"无","p":"home","m":5,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"给一双鞋擦干净鞋底","d":"翻过来看纹路里卡了什么。","n":"旧牙刷","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"记下今天听到的第一句话","d":"原话，不加评论。","n":"纸笔","p":"home","m":5,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"把书桌上的线理一根","d":"只理一根，不贪多。","n":"一根数据线","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"泡一杯东西，等它凉","d":"不碰手机，坐着等温度刚好。","n":"杯子","p":"home","m":10,"c":"0 元","who":["solo","parent"],"r":"rare"},{"t":"给很久没联系的号码发句在吗","d":"发完就放下手机，不等回复。","n":"手机","p":"home","m":5,"c":"0 元","who":["solo","parent"],"r":"rare"},{"t":"把钱包里的小票全清掉","d":"留一张最旧的，其余扔。","n":"钱包","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"关灯坐三分钟","d":"不看屏幕，只听屋里的声音。","n":"无","p":"home","m":5,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"把一本书翻到中间那页","d":"只读那一页，读完合上。","n":"一本书","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"把窗台从一头擦到另一头","d":"顺手把上面的东西重新摆一遍。","n":"抹布","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"写三个最近学会的词","d":"不查，凭记忆写，写完再查对不对。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["solo","kid"],"r":"rare"},{"t":"给明天的早饭定好","d":"现在就把要用的东西拿出来。","n":"食材","p":"home","m":5,"c":"0 元","who":["solo","couple"],"r":"common"},{"t":"把一件衣服补一下","d":"扣子、线头或起球，只处理一处。","n":"针线或剪刀","p":"home","m":15,"c":"0 元","who":["solo"],"r":"rare"},{"t":"录一段 20 秒的房间声音","d":"不开口，只录环境音。","n":"手机","p":"home","m":5,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"把调料瓶按高矮排一次","d":"顺便擦一下瓶底。","n":"调料瓶","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"翻一遍收藏夹，删三条","d":"只删三条，不许多删。","n":"手机","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"给镜子擦出一块干净","d":"只擦一小块，看清楚自己的脸。","n":"纸巾","p":"home","m":5,"c":"0 元","who":["solo"],"r":"rare"},{"t":"把拖鞋摆正","d":"门口、浴室、床边，全部朝向一致。","n":"拖鞋","p":"home","m":5,"c":"0 元","who":["solo","couple"],"r":"common"},{"t":"找一根旧充电线试一遍","d":"能用的收好，不能用的直接扔。","n":"一堆线","p":"home","m":10,"c":"0 元","who":["solo"],"r":"common"},{"t":"写下今天花了多少钱","d":"只写数字和买了什么，不算总账。","n":"纸笔","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"给一扇窗开五分钟","d":"不管天气，开满五分钟再关。","n":"一扇窗","p":"home","m":5,"c":"0 元","who":["solo","couple","kid","parent"],"r":"common"},{"t":"把水杯装满放在看得见的地方","d":"接下来一小时喝完它。","n":"水杯","p":"home","m":5,"c":"0 元","who":["solo","couple","kid","parent"],"r":"common"},{"t":"给家里一样东西换个用途","d":"比如拿马克杯装笔，用一天看看。","n":"任意物件","p":"home","m":5,"c":"0 元","who":["solo","kid"],"r":"rare"},{"t":"睡前把手机放到够不着的地方","d":"定好闹钟，明早再拿。","n":"手机","p":"home","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"走一条没走过的路回家","d":"只多绕五分钟，不导航。","n":"一双鞋","p":"out","m":20,"c":"0 元","who":["solo","couple"],"r":"rare"},{"t":"数一段路上的红色东西","d":"从门口数到路口，记下总数。","n":"无","p":"out","m":10,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"进一家没进过的店","d":"只看不买，出来记下最奇怪的一样东西。","n":"无","p":"out","m":15,"c":"0 元","who":["solo","couple"],"r":"common"},{"t":"拍一张今天的天空","d":"同一个位置，和上一次比一比。","n":"手机","p":"out","m":5,"c":"0 元","who":["solo","couple","kid","parent"],"r":"common"},{"t":"坐一站没坐过的公交","d":"随便哪路，坐一站就下。","n":"公交卡","p":"out","m":20,"c":"几块钱","who":["solo"],"r":"rare"},{"t":"认真看着店员说声谢谢","d":"对店员或保安，看着对方说完。","n":"无","p":"out","m":5,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"找一棵树认一认","d":"拍叶子，回来查它叫什么。","n":"手机","p":"out","m":10,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"在长椅上坐满十分钟","d":"不掏手机，只看人来人往。","n":"长椅","p":"out","m":10,"c":"0 元","who":["solo"],"r":"rare"},{"t":"买一样从没吃过的东西","d":"只买最小份，尝一口就行。","n":"零钱","p":"out","m":10,"c":"几块钱","who":["solo","couple","kid"],"r":"common"},{"t":"把耳机摘下来走一段","d":"听街上的声音，走到下一个路口。","n":"无","p":"out","m":10,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"给一张街景拍局部","d":"只拍一个门牌、一个把手或一块砖。","n":"手机","p":"out","m":10,"c":"0 元","who":["solo"],"r":"rare"},{"t":"去图书馆翻一本不相关的书","d":"挑最厚那本，只读目录。","n":"无","p":"out","m":20,"c":"0 元","who":["solo"],"r":"common"},{"t":"记下一句路人的对话","d":"原话，不补上下文。","n":"手机","p":"out","m":10,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"找一个邮筒或旧电话亭","d":"拍下来，记下位置。","n":"手机","p":"out","m":15,"c":"0 元","who":["solo","couple"],"r":"rare"},{"t":"走楼梯代替电梯","d":"只今天这一趟，慢慢走。","n":"无","p":"out","m":5,"c":"0 元","who":["solo","couple","kid"],"r":"common"},{"t":"给一朵花或一片叶子拍特写","d":"对焦到能看见纹路。","n":"手机","p":"out","m":5,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"在便利店只看价签","d":"找出最贵和最便宜的，差多少。","n":"无","p":"out","m":10,"c":"0 元","who":["solo","kid"],"r":"rare"},{"t":"换一只手拎东西","d":"一路换到回家。","n":"袋子","p":"out","m":10,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"给自己买一支笔","d":"挑最便宜但写得顺的，用一天。","n":"几块钱","p":"out","m":10,"c":"几块钱","who":["solo"],"r":"common"},{"t":"找一处安静的地方站三分钟","d":"不看手机，不动。","n":"无","p":"out","m":5,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"记下今天经过的三条路名","d":"回来在地图上连起来看。","n":"手机","p":"out","m":10,"c":"0 元","who":["solo","kid"],"r":"common"},{"t":"路过玻璃时对自己点个头","d":"别停下，做完就走。","n":"无","p":"out","m":5,"c":"0 元","who":["solo"],"r":"hidden"},{"t":"把口袋里的东西全掏出来摆一次","d":"看看有什么是根本用不上的。","n":"口袋","p":"out","m":5,"c":"0 元","who":["solo"],"r":"common"},{"t":"找一家店闻一闻","d":"只在门口闻，判断在做什么。","n":"无","p":"out","m":5,"c":"0 元","who":["solo","couple"],"r":"rare"},{"t":"提前一站下车走回去","d":"多走的那段用来看橱窗。","n":"公交卡","p":"out","m":20,"c":"几块钱","who":["solo","couple"],"r":"common"},{"t":"给对方写张纸条藏起来","d":"藏在他今天一定会翻的地方，内容只有一句。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["couple","kid","parent"],"r":"rare"},{"t":"一起数路上有多少辆红车","d":"各猜一个数，到路口对答案。","n":"无","p":"out","m":15,"c":"0 元","who":["couple","kid"],"r":"common"},{"t":"互相拍一张不笑的照片","d":"不许摆姿势，拍完不许删。","n":"手机","p":"both","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"rare"},{"t":"各自点一道对方没吃过的菜","d":"不解释为什么，上桌再说。","n":"一顿饭","p":"both","m":30,"c":"一顿饭","who":["couple","parent"],"r":"common"},{"t":"交换手机壁纸十分钟","d":"十分钟后再换回来。","n":"手机","p":"both","m":10,"c":"0 元","who":["couple","kid"],"r":"hidden"},{"t":"一起把一首歌听完","d":"谁都不许切，也不许说话。","n":"耳机或音箱","p":"home","m":5,"c":"0 元","who":["couple","kid"],"r":"common"},{"t":"给对方倒一杯水","d":"不说话，放在他手边就走。","n":"杯子","p":"home","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"各自写三个今天的小事","d":"写完对一对，看有没有重了。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["couple","kid","parent"],"r":"rare"},{"t":"一起擦一扇窗","d":"一个擦里面一个擦外面，比谁那边干净。","n":"抹布","p":"home","m":15,"c":"0 元","who":["couple","kid"],"r":"common"},{"t":"用一句话描述对方今天穿的衣服","d":"说错要重说。","n":"无","p":"both","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"一起走一段不说话的路","d":"到路口才能开口。","n":"无","p":"out","m":15,"c":"0 元","who":["couple","kid"],"r":"hidden"},{"t":"给对方选一首歌","d":"只发歌名，不附言。","n":"手机","p":"both","m":5,"c":"0 元","who":["couple","parent"],"r":"common"},{"t":"各画一样桌上的东西","d":"三分钟，画完互相猜。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["couple","kid"],"r":"rare"},{"t":"一起翻一本旧相册","d":"只翻不评价，翻到哪算哪。","n":"相册","p":"home","m":20,"c":"0 元","who":["couple","parent","kid"],"r":"rare"},{"t":"把今天的晚饭各拍一张","d":"对比同一个菜在两个镜头里的样子。","n":"手机","p":"home","m":5,"c":"0 元","who":["couple","parent"],"r":"common"},{"t":"互相问一个从没问过的问题","d":"必须认真答，不许说随便。","n":"无","p":"both","m":10,"c":"0 元","who":["couple","parent"],"r":"hidden"},{"t":"一起给一盆植物浇水","d":"一个人扶着，一个人倒。","n":"植物、水","p":"home","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"各自猜对方现在在想什么","d":"写在纸上同时亮出来。","n":"纸笔","p":"both","m":5,"c":"0 元","who":["couple","kid"],"r":"rare"},{"t":"分一副耳机走十分钟","d":"各戴一边，不换歌。","n":"耳机","p":"out","m":10,"c":"0 元","who":["couple","kid"],"r":"common"},{"t":"给对方留最后一口","d":"今天任何一样吃的，留一口给他。","n":"一份食物","p":"both","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"一起找家里最旧的一样东西","d":"猜它在这儿待了几年。","n":"无","p":"home","m":10,"c":"0 元","who":["couple","kid","parent"],"r":"rare"},{"t":"各自推荐一家店","d":"只说店名和一个理由，不改口。","n":"无","p":"both","m":5,"c":"0 元","who":["couple","parent"],"r":"common"},{"t":"把一张纸撕成两半再拼回去","d":"拼好写上日期收起来。","n":"纸","p":"home","m":5,"c":"0 元","who":["couple","kid"],"r":"hidden"},{"t":"给对方拍一张背影","d":"不叫他，偷偷拍。","n":"手机","p":"both","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"一起数楼梯","d":"从一楼数到门口，看两人是否一致。","n":"楼梯","p":"out","m":5,"c":"0 元","who":["couple","kid"],"r":"common"},{"t":"各自说出今天最早做的一件事","d":"谁先想起来谁先说。","n":"无","p":"both","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"一起关灯坐三分钟","d":"谁先说话谁输。","n":"无","p":"home","m":5,"c":"0 元","who":["couple","kid"],"r":"hidden"},{"t":"给对方一样东西换个位置","d":"只挪一处，等他自己发现。","n":"任意物件","p":"home","m":5,"c":"0 元","who":["couple","kid"],"r":"rare"},{"t":"一起看一段旧视频","d":"只看一分钟，不快进。","n":"手机","p":"home","m":5,"c":"0 元","who":["couple","parent","kid"],"r":"common"},{"t":"互相抄一句今天看到的话","d":"抄在纸上交换。","n":"纸笔","p":"both","m":10,"c":"0 元","who":["couple","parent"],"r":"rare"},{"t":"一起做一顿只有两个菜的饭","d":"一人负责一个，不管好不好吃。","n":"食材","p":"home","m":30,"c":"一顿饭","who":["couple","parent","kid"],"r":"common"},{"t":"给对方指一样你今天注意到的小东西","d":"必须是很小的那种。","n":"无","p":"both","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"各猜一次明天的天气","d":"写下来，明天对答案。","n":"纸笔","p":"home","m":5,"c":"0 元","who":["couple","kid","parent"],"r":"common"},{"t":"一起把沙发上的东西归位","d":"不说话，分工做完。","n":"无","p":"home","m":10,"c":"0 元","who":["couple","kid"],"r":"common"},{"t":"给对方起一个今天专用的外号","d":"只今天叫，明天作废。","n":"无","p":"both","m":5,"c":"0 元","who":["couple","kid"],"r":"hidden"},{"t":"让孩子给你讲一件今天的事","d":"只听不纠正，听完复述一遍给他。","n":"无","p":"both","m":10,"c":"0 元","who":["kid"],"r":"common"},{"t":"一起趴地上找三样小东西","d":"定个范围，谁先找齐谁赢。","n":"无","p":"home","m":10,"c":"0 元","who":["kid"],"r":"common"},{"t":"用积木搭一座能站住最高的塔","d":"倒了就重来一次，只一次。","n":"积木","p":"home","m":20,"c":"0 元","who":["kid"],"r":"rare"},{"t":"各画一个今天","d":"画完互相讲，不问像不像。","n":"纸笔","p":"home","m":15,"c":"0 元","who":["kid","parent"],"r":"common"},{"t":"一起数家里有多少个圆","d":"从客厅数到厨房，记下来。","n":"无","p":"home","m":10,"c":"0 元","who":["kid"],"r":"hidden"},{"t":"把一件家务交给孩子全权做","d":"不插手、不返工。","n":"抹布或小扫把","p":"home","m":10,"c":"0 元","who":["kid"],"r":"rare"},{"t":"出门只走孩子选的路","d":"他说往哪就往哪，走十分钟。","n":"无","p":"out","m":15,"c":"0 元","who":["kid","couple"],"r":"common"},{"t":"一起给一样东西量长度","d":"用手掌、用鞋子，比一比差多少。","n":"无","p":"home","m":10,"c":"0 元","who":["kid"],"r":"rare"},{"t":"让孩子给你出三道题","d":"你故意答错一道，看他怎么纠正。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["kid"],"r":"hidden"},{"t":"把落叶或石头按大小排队","d":"排好拍张照。","n":"落叶","p":"out","m":10,"c":"0 元","who":["kid"],"r":"common"},{"t":"各学一个对方会的手势","d":"互相教，教不会也算。","n":"无","p":"both","m":5,"c":"0 元","who":["kid","parent"],"r":"common"},{"t":"一人一句轮流编故事","d":"接到第三轮就停，不求结尾。","n":"无","p":"both","m":10,"c":"0 元","who":["kid","couple"],"r":"common"},{"t":"一起找五样红色的东西","d":"找到一样说一样，不许重复。","n":"无","p":"both","m":10,"c":"0 元","who":["kid"],"r":"common"},{"t":"让孩子决定今晚的一道菜","d":"他说什么就做什么，不劝改。","n":"食材","p":"home","m":30,"c":"一顿饭","who":["kid","parent"],"r":"common"},{"t":"一起洗手，比谁洗得慢","d":"认真洗，数到二十。","n":"水","p":"home","m":5,"c":"0 元","who":["kid"],"r":"common"},{"t":"把今天的天气画成一个表情","d":"贴在冰箱上。","n":"纸笔","p":"home","m":5,"c":"0 元","who":["kid","parent"],"r":"common"},{"t":"一起听一段雨声或风声","d":"关掉其他声音，听满一分钟。","n":"手机或窗","p":"home","m":5,"c":"0 元","who":["kid","couple"],"r":"hidden"},{"t":"给孩子一样东西让他藏起来","d":"你找三次，找不到就认输。","n":"小物件","p":"home","m":10,"c":"0 元","who":["kid"],"r":"rare"},{"t":"一起给一株植物量身高","d":"记在纸上，写上日期。","n":"尺子、纸","p":"home","m":10,"c":"0 元","who":["kid","parent"],"r":"rare"},{"t":"各自模仿一种动物让对方猜","d":"只许三声，不许说话。","n":"无","p":"both","m":10,"c":"0 元","who":["kid","couple"],"r":"common"},{"t":"让孩子给你拍一张照片","d":"不指导，他拍成什么样都留着。","n":"手机","p":"both","m":5,"c":"0 元","who":["kid","parent"],"r":"rare"},{"t":"一起把玩具按颜色分一次","d":"只分一类，剩下的不动。","n":"玩具","p":"home","m":15,"c":"0 元","who":["kid"],"r":"common"},{"t":"出门各捡一样自然的东西","d":"回来摆在一起讲讲为什么选它。","n":"无","p":"out","m":15,"c":"0 元","who":["kid"],"r":"common"},{"t":"一起数到一百","d":"一人一个数，轮流来。","n":"无","p":"both","m":5,"c":"0 元","who":["kid"],"r":"hidden"},{"t":"让孩子教你说一句他最近爱说的话","d":"认真学，学着用一次。","n":"无","p":"both","m":5,"c":"0 元","who":["kid","parent"],"r":"common"},{"t":"把一张纸折成任意东西","d":"不查教程，折成什么算什么。","n":"纸","p":"home","m":10,"c":"0 元","who":["kid","couple"],"r":"common"},{"t":"关灯用手电照手影","d":"各做一个，让对方猜。","n":"手电","p":"home","m":10,"c":"0 元","who":["kid","couple"],"r":"rare"},{"t":"一起给全家每人画一个杯子","d":"画在纸上，晚饭时用自己那个。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["kid","parent"],"r":"rare"},{"t":"让孩子给你安排一件小事","d":"他说的照做，不打折。","n":"无","p":"both","m":10,"c":"0 元","who":["kid"],"r":"hidden"},{"t":"把今天最开心的一件事各说一遍","d":"说完击个掌。","n":"无","p":"both","m":5,"c":"0 元","who":["kid","couple","parent"],"r":"common"},{"t":"问一个他们年轻时的问题","d":"只问一个，听完不插嘴。","n":"无","p":"both","m":15,"c":"0 元","who":["parent","couple"],"r":"rare"},{"t":"一起翻一张老照片","d":"让他说照片里那天的事。","n":"相册","p":"home","m":15,"c":"0 元","who":["parent","kid"],"r":"rare"},{"t":"帮他们把手机字调大一号","d":"顺手把常用联系人放前面。","n":"他们的手机","p":"home","m":10,"c":"0 元","who":["parent"],"r":"common"},{"t":"跟他们学做一道菜的一步","d":"只学一步，记在纸上。","n":"食材","p":"home","m":20,"c":"0 元","who":["parent","kid"],"r":"common"},{"t":"一起走一段他们常走的路","d":"让他们带路，你跟着。","n":"无","p":"out","m":20,"c":"0 元","who":["parent"],"r":"rare"},{"t":"把他们说的一句口头禅记下来","d":"原话，不改字。","n":"纸笔","p":"both","m":5,"c":"0 元","who":["parent","kid"],"r":"hidden"},{"t":"一起把药盒按早中晚分好","d":"分完贴上字，别自作主张改量。","n":"药盒、纸","p":"home","m":15,"c":"0 元","who":["parent"],"r":"common"},{"t":"给家里一样旧东西问来历","d":"听完记下年份。","n":"无","p":"home","m":10,"c":"0 元","who":["parent","kid"],"r":"rare"},{"t":"陪他们看一集他们选的节目","d":"不换台、不刷手机。","n":"电视","p":"home","m":30,"c":"0 元","who":["parent","couple"],"r":"common"},{"t":"一起量一次血压或记一次步数","d":"只记数字，不评价。","n":"血压计或手机","p":"home","m":5,"c":"0 元","who":["parent"],"r":"common"},{"t":"把他们的一句叮嘱录下来","d":"十秒就够，存好。","n":"手机","p":"both","m":5,"c":"0 元","who":["parent","kid"],"r":"hidden"},{"t":"帮他们清一次相册重复照片","d":"只删重复，别的一张不动。","n":"他们的手机","p":"home","m":15,"c":"0 元","who":["parent"],"r":"common"},{"t":"一起给一盆花换水或松土","d":"慢慢做，边做边聊。","n":"花","p":"home","m":10,"c":"0 元","who":["parent","kid"],"r":"common"},{"t":"让他们教你一个老办法","d":"补衣服、挑菜、看天气都行。","n":"无","p":"both","m":10,"c":"0 元","who":["parent","kid"],"r":"rare"},{"t":"一起吃一样他们小时候常吃的","d":"买最小份，尝一口。","n":"零钱","p":"out","m":15,"c":"几块钱","who":["parent","kid","couple"],"r":"common"},{"t":"给他们拍一张不摆姿势的照片","d":"不修图，直接发给他自己。","n":"手机","p":"both","m":5,"c":"0 元","who":["parent","kid"],"r":"rare"},{"t":"一起把一张旧单据或信翻出来","d":"只读不评价。","n":"旧物","p":"home","m":10,"c":"0 元","who":["parent"],"r":"hidden"},{"t":"陪他们去一趟菜场或超市","d":"让他们挑，你拎东西。","n":"无","p":"out","m":30,"c":"0 元","who":["parent","kid"],"r":"common"},{"t":"问一句最近有没有哪里不舒服","d":"听完别急着给建议。","n":"无","p":"both","m":5,"c":"0 元","who":["parent"],"r":"common"},{"t":"把今天的三件事各说一件","d":"说完就散，不总结。","n":"无","p":"both","m":10,"c":"0 元","who":["parent","couple","kid"],"r":"common"},{"t":"写下今年还没做完的一件事","d":"只写不计划，折起来收好。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["solo","couple","parent"],"r":"hidden"},{"t":"给未来的自己写一句日期","d":"写上打开的日子，藏进一本书。","n":"纸笔","p":"home","m":10,"c":"0 元","who":["solo","kid"],"r":"hidden"},{"t":"找出家里最旧的一张纸","d":"看上面的日期，拍张照。","n":"无","p":"home","m":5,"c":"0 元","who":["solo","parent"],"r":"hidden"},{"t":"在同一张纸上按个手印","d":"写上今天日期，收起来。","n":"纸、印泥","p":"home","m":10,"c":"0 元","who":["couple","kid","parent"],"r":"hidden"},{"t":"各自说一个今年学会的东西","d":"不许说没什么。","n":"无","p":"both","m":10,"c":"0 元","who":["solo","couple","kid","parent"],"r":"rare"},{"t":"给窗外拍一张同角度的照片","d":"存一起，不修图。","n":"手机","p":"home","m":5,"c":"0 元","who":["solo","couple"],"r":"rare"},{"t":"一起把今年的照片挑三张","d":"不管好不好看，只挑三张。","n":"手机","p":"home","m":15,"c":"0 元","who":["solo","couple","kid","parent"],"r":"rare"},{"t":"给一个人写一句迟到的谢谢","d":"发出去，不等回复。","n":"手机","p":"home","m":10,"c":"0 元","who":["solo","couple","parent"],"r":"hidden"},{"t":"数今天说了多少次好","d":"从现在起到睡前，记个数。","n":"纸笔","p":"both","m":5,"c":"0 元","who":["solo","couple","kid","parent"],"r":"hidden"},{"t":"各自留一样今天的小东西在口袋里","d":"明天再拿出来看。","n":"小物件","p":"both","m":5,"c":"0 元","who":["solo","couple","kid","parent"],"r":"hidden"}];
+var KEY='one_thing_demo_v1', DAILY=3, RANK={common:'日常',rare:'少见',hidden:'隐藏款'};
+var $=function(s){return document.querySelector(s)};
+function pad(n){return n<10?'0'+n:''+n}
+function keyOf(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate())}
+function today(){return keyOf(new Date())}
+function shiftKey(k,delta){var p=k.split('-');var d=new Date(+p[0],+p[1]-1,+p[2]);d.setDate(d.getDate()+delta);return keyOf(d)}
+function defaults(){return {mode:'alone',done:{},found:{},draws:{},custom:[],createdAt:today()}}
+function load(){var raw=null;try{raw=JSON.parse(localStorage.getItem(KEY))}catch(e){}if(!raw||typeof raw!=='object')raw=defaults();var d=defaults();for(var k in d){if(!(k in raw))raw[k]=d[k]}if(raw.mode!=='alone'&&raw.mode!=='together')raw.mode='alone';if(!Array.isArray(raw.custom))raw.custom=[];return raw}
+function save(s){try{localStorage.setItem(KEY,JSON.stringify(s))}catch(e){}return s}
+function allCards(s){return CARDS.concat(s.custom||[])}
+function inMode(c,mode){if(!c.who||!c.who.length)return true;if(mode==='alone')return c.who.indexOf('solo')>-1;for(var i=0;i<c.who.length;i++){if(c.who[i]!=='solo')return true}return false}
+function pool(s,mode,exclude){var all=allCards(s),dt=s.done[today()]||[];var usable=all.filter(function(c){return inMode(c,mode)&&c.t!==exclude});var fresh=usable.filter(function(c){return dt.indexOf(c.t)<0});return fresh.length?fresh:usable}
+function pick(s,mode,exclude){var p=pool(s,mode,exclude);return p.length?p[Math.floor(Math.random()*p.length)]:null}
+function drawsLeft(s){return Math.max(0,DAILY-(s.draws[today()]||0))}
+function consume(s){var t=today();s.draws[t]=(s.draws[t]||0)+1;return save(s)}
+function markDone(s,c){var t=today();if(!s.done[t])s.done[t]=[];if(s.done[t].indexOf(c.t)<0)s.done[t].push(c.t);if(!s.found[c.t])s.found[c.t]={date:t,r:c.r||'common'};return save(s)}
+function totalDone(s){var n=0;for(var k in s.done){if(s.done.hasOwnProperty(k))n+=s.done[k].length}return n}
+function foundCount(s){return Object.keys(s.found).length}
+function streak(s){var k=today();if(!(s.done[k]&&s.done[k].length))k=shiftKey(k,-1);var n=0;for(var i=0;i<400;i++){if(s.done[k]&&s.done[k].length){n++;k=shiftKey(k,-1)}else break}return n}
+function yearText(s){var y=String(new Date().getFullYear());var ts=Object.keys(s.found).filter(function(t){return (s.found[t].date||'').indexOf(y)===0});var sp=ts.filter(function(t){return s.found[t].r&&s.found[t].r!=='common'});return y+' 年，你做掉了 '+ts.length+' 件小事。连续 '+streak(s)+' 天。'+(sp.length?'其中有几件不太常见：'+sp.slice(0,3).join('、')+'。':'')}
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]})}
+
+var S=load(), cur=null, tab='index';
+function toast(msg){var t=$('#toast');t.textContent=msg;t.className='toast on';clearTimeout(toast._t);toast._t=setTimeout(function(){t.className='toast'},1600)}
+function decorate(c,s){var tags=[];if(c.r&&c.r!=='common')tags.push('<span class="tag '+c.r+'">'+RANK[c.r]+'</span>');if(c.m)tags.push('<span class="tag">约 '+c.m+' 分钟</span>');if(c.c)tags.push('<span class="tag">'+esc(c.c)+'</span>');if(c.mine)tags.push('<span class="tag">我加的</span>');return {tags:tags.join(''),isNew:!s.found[c.t]}}
+
+function renderIndex(){
+  var s=load(), left=drawsLeft(s), d=cur?decorate(cur,s):null;
+  var h='<div class="h1">今天做一件小事</div><div class="sub">不知道做什么的时候，点一下，做掉它</div>'
+   +'<div class="card stat"><div class="si"><div class="k">累计做过</div><div class="v">'+totalDone(s)+'</div></div>'
+   +'<div class="si"><div class="k">连续天数</div><div class="v">'+streak(s)+'</div></div>'
+   +'<div class="si"><div class="k">已收集</div><div class="v">'+foundCount(s)+'</div></div></div>'
+   +'<button class="btn-main" id="btnDraw">'+(left<=0?'今天先到这儿':'抽一件')+'</button>'
+   +'<div class="tip">'+(left<=0?'明天再来，池子每天重新开':'今天还能开 '+left+' 次')+'</div>';
+  if(cur){
+    h+='<div class="card result"><div class="tags">'+d.tags+'</div><div class="tt">'+esc(cur.t)+'</div>'
+      +(cur.d?'<div class="dd">'+esc(cur.d)+'</div>':'')
+      +(cur.n?'<div class="need"><span class="k">需要的东西</span><span class="v">'+esc(cur.n)+'</span></div>':'')
+      +'<div class="lab">此刻</div><div class="chips">'
+      +'<span class="chip '+(S.mode==='alone'?'on':'')+'" data-mode="alone">一个人</span>'
+      +'<span class="chip '+(S.mode==='together'?'on':'')+'" data-mode="together">有人陪</span></div>'
+      +'<div class="acts"><span class="act" id="btnAgain">换一个</span><span class="act" id="btnShare">分享给 TA</span><span class="act primary" id="btnDone">做完了</span></div></div>';
+  }
+  h+='<div class="foot">数据只存在这台设备上，不会上传</div>';
+  $('#page-index').innerHTML=h;
+  $('#btnDraw').onclick=onDraw;
+  if(cur){
+    $('#btnAgain').onclick=function(){var s2=load();showCard(pick(s2,S.mode,cur.t))};
+    $('#btnDone').onclick=onDone;
+    $('#btnShare').onclick=onShare;
+    Array.prototype.forEach.call(document.querySelectorAll('#page-index [data-mode]'),function(el){el.onclick=function(){onMode(el.getAttribute('data-mode'))}});
+  }
+}
+function renderCollection(){
+  var s=load(), all=allCards(s), f=foundCount(s), pct=all.length?Math.round(f/all.length*100):0;
+  var groups=[{key:'hidden',name:'隐藏款'},{key:'rare',name:'少见'},{key:'common',name:'日常'}];
+  var h='<div class="h1">做过的小事</div><div class="sub">抽到不算，做完了才收进图鉴</div>'
+   +'<div class="card" style="margin-top:18px"><div class="rv">'+esc(yearText(s))+'</div><div class="btns">'
+   +'<button class="btn-ghost" id="btnCopy">复制这段回顾</button><button class="btn-ghost" id="btnShareRv">分享给 TA</button></div></div>'
+   +'<div class="card"><div class="prow"><span>收集进度</span><span>'+f+' / '+all.length+'</span></div><div class="bar"><div class="fill" style="width:'+pct+'%"></div></div></div>';
+  groups.forEach(function(g){
+    var list=all.filter(function(c){return (c.r||'common')===g.key});
+    var got=list.filter(function(c){return !!s.found[c.t]}).length;
+    h+='<div class="lab">'+g.name+' · 已收集 '+got+' / '+list.length+'</div><div class="grid">';
+    list.forEach(function(c){var ok=!!s.found[c.t];h+='<div class="cell '+(ok?'got':'')+'">'+(ok?esc(c.t):'还没抽到')+'</div>'});
+    h+='</div>';
+  });
+  h+='<div class="foot">断一天不清零，收集过的都在</div>';
+  $('#page-collection').innerHTML=h;
+  $('#btnCopy').onclick=function(){copy(yearText(load()),'已复制')};
+  $('#btnShareRv').onclick=function(){showSheet('今年我做了 '+Object.keys(load().found).length+' 件小事','年度回顾卡片')};
+}
+function renderSettings(){
+  var s=load();
+  var h='<div class="h1">设置</div><div class="sub">全部数据只在这台设备上</div>'
+   +'<div class="card" style="margin-top:18px"><div class="ct">默认情境</div><div class="hint">抽到卡之后还能随时切换，会记住你上次选的。</div>'
+   +'<div class="chips" style="margin-top:14px"><span class="chip '+(s.mode==='alone'?'on':'')+'" data-mode="alone">一个人</span>'
+   +'<span class="chip '+(s.mode==='together'?'on':'')+'" data-mode="together">有人陪</span></div></div>'
+   +'<div class="card"><div class="ct">加一件自己的小事</div><div class="hint">只写标题就行。内置 '+CARDS.length+' 条，加进来的只会在这台设备上出现。</div>'
+   +'<input class="inp" id="inpCustom" placeholder="例如：给冰箱贴张便签"><button class="btn-ghost" id="btnAdd" style="width:100%;margin-top:10px">加上</button>';
+  if(s.custom.length){h+='<div style="margin-top:14px">';s.custom.forEach(function(c){h+='<div class="crow"><span>'+esc(c.t)+'</span><span class="cdel" data-del="'+esc(c.t)+'">删掉</span></div>'});h+='</div>'}
+  h+='</div><div class="card"><div class="ct">备份与恢复</div><div class="hint">换设备前先复制一份备份存好。</div><div class="btns">'
+   +'<button class="btn-ghost" id="btnBackup">复制备份</button><button class="btn-ghost" id="btnRestore">从剪贴板恢复</button></div>'
+   +'<button class="btn-ghost danger" id="btnReset">清空全部记录</button></div>'
+   +'<div class="card" style="background:transparent;border:none;padding:0"><div class="hint">纯本地小工具：不登录、不收集个人信息、不上传任何内容、没有广告和支付。分享出去的只是预设小事的标题。</div></div>'
+   +'<div class="foot">数据不上传，换设备不会自动同步</div>';
+  $('#page-settings').innerHTML=h;
+  Array.prototype.forEach.call(document.querySelectorAll('#page-settings [data-mode]'),function(el){el.onclick=function(){var st=load();st.mode=el.getAttribute('data-mode');S=save(st);renderSettings();toast('已设为默认')}});
+  $('#btnAdd').onclick=function(){var v=$('#inpCustom').value.trim();if(!v){toast('先写点什么');return}var st=load();if(allCards(st).some(function(c){return c.t===v})){toast('已经有了');return}st.custom.push({t:v,d:'',n:'',p:'both',m:0,c:'',who:st.mode==='alone'?['solo']:['couple','kid','parent'],r:'common',mine:true});S=save(st);renderSettings();toast('加好了')};
+  Array.prototype.forEach.call(document.querySelectorAll('#page-settings [data-del]'),function(el){el.onclick=function(){var t=el.getAttribute('data-del');var st=load();st.custom=st.custom.filter(function(c){return c.t!==t});S=save(st);renderSettings()}});
+  $('#btnBackup').onclick=function(){copy(JSON.stringify(load()),'备份已复制')};
+  $('#btnRestore').onclick=function(){toast('Demo 里请用「复制备份」后手动粘贴；真小程序支持一键恢复')};
+  $('#btnReset').onclick=function(){if(confirm('清空全部记录？做过的事和图鉴都会没有。')){S=save(defaults());cur=null;renderAll();toast('已清空')}};
+}
+function renderAll(){S=load();renderIndex();renderCollection();renderSettings()}
+function showCard(c){if(!c){toast('今天这个条件下都做过了');return}cur=c;renderIndex()}
+function onDraw(){var s=load();if(drawsLeft(s)<=0){goTab('collection');return}s=consume(s);showCard(pick(s,S.mode,cur?cur.t:''))}
+function onMode(m){if(m===S.mode)return;var s=load();s.mode=m;S=save(s);showCard(pick(S,m,cur?cur.t:''))}
+function onDone(){if(!cur)return;var s=load(),wasNew=!s.found[cur.t],finished=cur.t;s=markDone(s,cur);S=s;S=save(S);toast(wasNew?'收进图鉴了':'记下了');setTimeout(function(){var s2=load();if((s2.done[today()]||[]).length>=DAILY){cur=null}else{cur=pick(s2,S.mode,finished)}renderAll()},700)}
+function onShare(){showSheet('抽到一件小事：'+cur.t,'对方打开直接看到这张卡 · 不消耗次数')}
+function showSheet(t,d){$('#shT').textContent=t;$('#shD').textContent=d;$('#sheet').className='sheet on'}
+function copy(text,msg){if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){toast(msg)},function(){toast(msg)})}else{toast(msg)}}
+function goTab(name){tab=name;Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(el){el.className='tab'+(el.getAttribute('data-tab')===name?' on':'')});Array.prototype.forEach.call(document.querySelectorAll('.page'),function(el){el.className='page'});$('#page-'+name).className='page on';$('#navTitle').textContent=name==='index'?'今天做一件小事':(name==='collection'?'图鉴':'设置');$('#screen').scrollTop=0;if(name==='index')renderIndex();if(name==='collection')renderCollection();if(name==='settings')renderSettings()}
+Array.prototype.forEach.call(document.querySelectorAll('.tab'),function(el){el.onclick=function(){goTab(el.getAttribute('data-tab'))}});
+$('#shClose').onclick=function(){$('#sheet').className='sheet'};
+$('#sheet').onclick=function(e){if(e.target===this)this.className='sheet'};
+renderAll();
+</script>
+</body>
+</html>
